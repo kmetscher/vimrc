@@ -32,13 +32,12 @@ rt.setup({
     end,
   },
 })
+vim.diagnostic.config({
+    virtual_text = false,
+})
 EOF
 
 tnoremap <C-\> <C-\><C-n>
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-nnoremap <C-h> <C-w>h
 
 set scrolloff=8
 set hidden
