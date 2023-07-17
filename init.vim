@@ -57,6 +57,7 @@ set cursorline
 set wildmenu
 set wildmode=list:longest
 set nowrap
+set mouse=
 
 colorscheme nightfly
 let g:nightflyTransparent = v:true
