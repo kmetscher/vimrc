@@ -18,22 +18,21 @@ require'nvim-treesitter.configs'.setup {
 				enable = true,
 		},
 		additional_vim_regex_highlighting = false,
+		indent = {
+			enable = true,
+		},
 }
 lsp.setup()
-vim.diagnostic.config({virtual_text = true})
-local rt = require("rust-tools")
-rt.setup({
-  server = {
-    on_attach = function(_, bufnr)
-      -- Hover actions
-      vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
-      -- Code action groups
-      vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
-    end,
-  },
-})
 vim.diagnostic.config({
-    virtual_text = false,
+    virtual_text = true,
+    signs = true,
+    update_in_insert = false,
+    underline = true,
+    float = {
+        focusable = false,
+        style = "minimal",
+        source = "always",
+    },
 })
 EOF
 
@@ -57,6 +56,7 @@ set cursorline
 set wildmenu
 set wildmode=list:longest
 set nowrap
+set mouse=
 
 colorscheme nightfly
-let g:nightflyTransparent = v:true
+
