@@ -1,42 +1,25 @@
 lua require('plugins')
 
 lua <<EOF
-local lsp = require('lsp-zero')
-lsp.preset('recommended')
-lsp.set_preferences({
-	suggest_lsp_servers = true,
-  	setup_servers_on_start = true,
-  	set_lsp_keymaps = true,
-  	configure_diagnostics = true,
-  	cmp_capabilities = true,
-  	manage_nvim_cmp = true,
-  	call_servers = 'local'
-})
-require'nvim-treesitter.configs'.setup {
-		auto_install = true,
-		highlight = {
-				enable = true,
-		},
-		additional_vim_regex_highlighting = false,
-		indent = {
-			enable = true,
-		},
-}
-lsp.setup()
-vim.diagnostic.config({
-    virtual_text = true,
-    signs = true,
-    update_in_insert = false,
-    underline = true,
-    float = {
-        focusable = false,
-        style = "minimal",
-        source = "always",
-    },
+local lsp_zero = require('lsp-zero')
+
+lsp_zero.on_attach(function(client, bufnr)
+  lsp_zero.default_keymaps({buffer = bufnr})
+end)
+
+require('mason').setup({})
+require('mason-lspconfig').setup({
+  ensure_installed = {'gopls'},
+  handlers = {
+    lsp_zero.default_setup,
+    gopls = function() 
+        local util = require 'lspconfig.util'
+        local mod_cache = '/home/c0w80yd4n/go/pkg/mod'
+        require('lspconfig').gopls.setup({})
+    end,
+  },
 })
 EOF
-
-tnoremap <C-\> <C-\><C-n>
 
 set scrolloff=8
 set hidden
@@ -59,4 +42,3 @@ set nowrap
 set mouse=
 
 colorscheme nightfly
-
