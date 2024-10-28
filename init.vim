@@ -1,39 +1,58 @@
 lua require('plugins')
-
 lua <<EOF
-local lsp = require('lsp-zero')
-lsp.preset('recommended')
-lsp.set_preferences({
-	suggest_lsp_servers = true,
-  	setup_servers_on_start = true,
-  	set_lsp_keymaps = true,
-  	configure_diagnostics = true,
-  	cmp_capabilities = true,
-  	manage_nvim_cmp = true,
-  	call_servers = 'local'
+vim.keymap.set('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>')
+vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>')
+vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>') 
+
+vim.api.nvim_create_autocmd('LspAttach', {
+  desc = 'LSP actions',
+  callback = function(event)
+    local opts = {buffer = event.buf}
+    vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
+    vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
+    vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
+    vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
+    vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
+    vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
+    vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
+    vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
+    vim.keymap.set({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
+    vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
+  end
 })
-require'nvim-treesitter.configs'.setup {
-		auto_install = true,
-		highlight = {
-				enable = true,
-		},
-		additional_vim_regex_highlighting = false,
-}
-lsp.setup()
-vim.diagnostic.config({virtual_text = true})
-local rt = require("rust-tools")
-rt.setup({
-  server = {
-    on_attach = function(_, bufnr)
-      -- Hover actions
-      vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
-      -- Code action groups
-      vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
-    end,
+
+local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+local default_setup = function(server)
+  require('lspconfig')[server].setup({
+    capabilities = lsp_capabilities,
+  })
+end
+
+require('mason').setup({})
+require('mason-lspconfig').setup({
+  ensure_installed = {},
+  handlers = {
+    default_setup,
   },
 })
-vim.diagnostic.config({
-    virtual_text = false,
+
+local cmp = require('cmp')
+
+cmp.setup({
+  sources = {
+    {name = 'nvim_lsp'},
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-y>'] = cmp.mapping.confirm({select = false}),
+
+    ['<C-Space>'] = cmp.mapping.complete(),
+  }),
+  snippet = {
+    expand = function(args)
+      require('luasnip').lsp_expand(args.body)
+    end,
+  },
 })
 EOF
 
@@ -60,4 +79,5 @@ set nowrap
 set mouse=
 
 colorscheme nightfly
-let g:nightflyTransparent = v:true
+let g:nightflyUnderlineMatchParen = v:true
+
