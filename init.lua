@@ -16,4 +16,4 @@ vim.opt.tabstop=4
 vim.opt.wildmenu = true
 vim.opt.wildmode = "list:longest"
 
-
+vim.lsp.enable("basedpyright")
